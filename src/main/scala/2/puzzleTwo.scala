@@ -4,7 +4,7 @@ import dayTwo.Game.parseGame
 import utils.inputReader.lines
 
 object puzzleTwo extends App {
-  private val gamesText = lines("dayTwo.txt")
+  private val gamesText = lines("2.txt")
   private val games = gamesText.map(parseGame)
 
   def minimumCubesInBag(game: Game): Bag =

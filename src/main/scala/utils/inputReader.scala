@@ -11,4 +11,7 @@ object inputReader {
     )
     .getLines
     .toList
+
+  def wholeFile(fileName: String): String =
+    Source.fromFile(s"$currentDirectory/src/main/resources/$fileName").mkString
 }

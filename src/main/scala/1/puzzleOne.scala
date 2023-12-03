@@ -1,11 +1,11 @@
 package dayOne
 
-import utils.inputReader.lines
+import utils.inputReader.{lines, wholeFile}
 
 import scala.io.Source
 
 object puzzleOne extends App {
-  private val linesOfText = lines("puzzleOneCalibrationDocument.txt")
+  private val linesOfText = lines("1.txt")
 
   def stripToListOfDigits(string: String): List[Char] =
     string.toList.filter(_.isDigit)

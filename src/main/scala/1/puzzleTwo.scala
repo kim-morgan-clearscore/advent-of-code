@@ -3,7 +3,7 @@ package dayOne
 import utils.inputReader.lines
 
 object puzzleTwo extends App {
-  private val linesOfText = lines("puzzleOneCalibrationDocument.txt")
+  private val linesOfText = lines("1.txt")
 
   private val oneToNine =
     List(One, Two, Three, Four, Five, Six, Seven, Eight, Nine)
