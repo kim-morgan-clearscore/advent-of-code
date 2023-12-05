@@ -5,8 +5,7 @@ import utils.inputReader.lines
 final case class Card(
     id: Int,
     winningNumbers: List[Int],
-    cardNumbers: List[Int],
-    extraCards: List[Card] = List.empty
+    cardNumbers: List[Int]
 ) {
   val numberOfWinningNumbersOnCard: Int =
     cardNumbers.count(winningNumbers.contains(_))
@@ -36,36 +35,33 @@ object puzzle extends App {
       .toList
   }
 
-  private def findExtraCards(
-      originalCards: List[Card],
-      cards: List[Card]
-  ): List[Card] =
-    cards match {
-      case ::(head, next) => {
-        val cardsToAdd = originalCards.slice(
-          head.id,
-          head.id + head.numberOfWinningNumbersOnCard
-        )
-        head.copy(extraCards = cardsToAdd) :: findExtraCards(
-          originalCards,
-          next
-        )
-      }
-      case Nil => List.empty
-    }
+  private def findIdsOfCopyCardsWon(card: Card): List[Int] = {
+    Range
+      .inclusive(card.id + 1, card.id + card.numberOfWinningNumbersOnCard)
+      .toList
+  }
 
-  private def countEachCard(
+  private def countCardsAndCopies(
       cards: List[Card],
-      counts: Map[Int, Int]
-  ): Map[Int, Int] =
-    cards match {
-      case ::(head, next) => {
-        val extraCardCount = head.extraCards.foldLeft(0)((acc, card) =>
-          acc + counts.get(card.id).getOrElse(0)
-        ) + head.extraCards.length
-        countEachCard(next, counts ++ Map(head.id -> extraCardCount))
-      }
-      case Nil => counts
+      counts: Map[Int, Int],
+      index: Int
+  ): Int =
+    if (index < 0)
+      counts.foldLeft(0)((acc, pair) => acc + pair._2) + cards.length
+    else {
+      val currentCard = cards(index)
+      val copyCardIds = findIdsOfCopyCardsWon(currentCard)
+      val totalOccurencesOfCopyCards =
+        copyCardIds.foldLeft(0)((acc, cardId) =>
+          acc + counts.get(cardId).getOrElse(0)
+        )
+      val sumForCurrentCardId =
+        totalOccurencesOfCopyCards + copyCardIds.length
+      countCardsAndCopies(
+        cards,
+        counts ++ Map(currentCard.id -> sumForCurrentCardId),
+        index - 1
+      )
     }
 
   private val parsedCards = cards.map(parseCard)
@@ -75,14 +71,12 @@ object puzzle extends App {
 
   println(partOneSolution)
 
-  private val partTwoSolution = {
-    val cardsWithExtras =
-      findExtraCards(parsedCards, parsedCards)
-    val countExtraCards =
-      countEachCard(cardsWithExtras.reverse, Map.empty).foldLeft(0)(
-        (acc, pair) => acc + pair._2
-      )
-    countExtraCards + parsedCards.length
+  private def partTwoSolution: Int = {
+    countCardsAndCopies(
+      parsedCards,
+      Map.empty,
+      parsedCards.length - 1
+    )
   }
 
   println(partTwoSolution)
