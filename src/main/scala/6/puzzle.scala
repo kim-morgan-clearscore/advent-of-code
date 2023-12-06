@@ -1,9 +1,7 @@
 package daySix
 
-import dayFive.puzzle.time
-
 final case class Race(timeAllowed: Long, recordDistance: Long) {
-  def findNumberOfPassingTimes: Long = {
+  def findNumberOfPassingAccelerationTimes: Long = {
     //formula for solving quadratic equation
     val a = -1
     val b = timeAllowed
@@ -20,17 +18,15 @@ object puzzle extends App {
     List(Race(52, 426), Race(94, 1374), Race(75, 1279), Race(94, 1216))
 
   private val partOneSolution = races
-    .map(_.findNumberOfPassingTimes)
+    .map(_.findNumberOfPassingAccelerationTimes)
     .foldLeft(1)((acc, attempt) => acc * attempt.toInt)
 
   println(partOneSolution)
 
   private val partTwoSolution = {
-    Race(52947594, 426137412791216L).findNumberOfPassingTimes
+    Race(52947594, 426137412791216L).findNumberOfPassingAccelerationTimes
   }
 
   println(partTwoSolution)
-
-  time { Race(52947594, 426137412791216L).findNumberOfPassingTimes }
 
 }
