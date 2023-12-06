@@ -1,7 +1,10 @@
 package daySix
 
+import dayFive.puzzle.time
+
 final case class Race(timeAllowed: Long, recordDistance: Long) {
   def findNumberOfPassingTimes: Long = {
+    //formula for solving quadratic equation
     val a = -1
     val b = timeAllowed
     val c = recordDistance * -1
@@ -27,5 +30,7 @@ object puzzle extends App {
   }
 
   println(partTwoSolution)
+
+  time { Race(52947594, 426137412791216L).findNumberOfPassingTimes }
 
 }
