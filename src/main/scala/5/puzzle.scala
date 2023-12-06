@@ -6,6 +6,7 @@ final case class Row(
     seedRange: SeedRange,
     transformation: BigInt => BigInt
 )
+
 final case class SeedRange(seedStart: BigInt, seedEnd: BigInt) {
   def split(splitPoint: BigInt): List[SeedRange] = {
     if (splitPoint > this.seedEnd) List(this)
@@ -15,6 +16,7 @@ final case class SeedRange(seedStart: BigInt, seedEnd: BigInt) {
         SeedRange(splitPoint + 1, this.seedEnd)
       )
   }
+
   def contains(seed: BigInt): Boolean = {
     seed >= this.seedStart && seed <= this.seedEnd
   }
@@ -22,6 +24,7 @@ final case class SeedRange(seedStart: BigInt, seedEnd: BigInt) {
   def map(transformation: BigInt => BigInt): SeedRange =
     SeedRange(transformation(seedStart), transformation(seedEnd))
 }
+
 object puzzle extends App {
   private val seedString =
     "1044452533 40389941 3710737290 407166728 1552449232 639689359 3327654041 26912583 3440484265 219136668 1126550158 296212400 2332393052 229950158 200575068 532702401 4163696272 44707860 3067657312 45353528"
@@ -70,6 +73,7 @@ object puzzle extends App {
       )
   }
 
+  // Part One
   private def transformSeed(seed: BigInt, map: List[Row]): BigInt = {
     map
       .find(row => row.seedRange.contains(seed))
@@ -86,6 +90,16 @@ object puzzle extends App {
       case Nil => seed
     }
   }
+
+  private val parsedMaps = parseMaps(maps)
+
+  private val partOneSolution = seedNumbers
+    .map(seed => transformSeedAcrossMaps(seed, parsedMaps))
+    .min
+
+  println(partOneSolution)
+
+  //Part Two
   def transformSeedRange(
       seedRange: SeedRange,
       map: List[Row],
@@ -131,14 +145,7 @@ object puzzle extends App {
     }
   }
 
-  val parsedMaps = parseMaps(maps)
   val parsedSeedStrings = parseSeedRange(seedString)
-
-  private val partOneSolution = seedNumbers
-    .map(seed => transformSeedAcrossMaps(seed, parsedMaps))
-    .min
-
-  println(partOneSolution)
 
   private val partTwoSolution =
     transformSeedRangesAcrossMaps(parsedSeedStrings, parsedMaps)
