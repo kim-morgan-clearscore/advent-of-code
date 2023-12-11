@@ -14,6 +14,7 @@ object puzzle extends App {
       index +: rowsToCosmicallyExpand(rows, index + 1)
     else rowsToCosmicallyExpand(rows, index + 1)
   }
+
   def columnsToCosmicallyExpand(
       rows: List[String],
       index: Int = 0
@@ -73,24 +74,30 @@ object puzzle extends App {
     Math.abs(galaxyOne.x - galaxyTwo.x) + Math.abs(galaxyOne.y - galaxyTwo.y)
   }
 
-  def totalDistanceOfAllGalaxies(galaxies: List[Galaxy]): Long = {
-    galaxies match {
-      case ::(head, next) =>
-        galaxies.foldLeft(0L)((acc, galaxy) =>
-          distanceOfTwoGalaxies(head, galaxy) + acc
-        ) + totalDistanceOfAllGalaxies(next)
-      case Nil => 0
-    }
-  }
-
-  val partOneSolution = totalDistanceOfAllGalaxies(
+  time(
     parseGalaxies(linesOfText, expansionFactor = 2)
+      .combinations(2)
+      .foldLeft(0L)((acc, pair) =>
+        acc + distanceOfTwoGalaxies(pair.head, pair.last)
+      )
   )
+
+  val partOneSolution =
+    parseGalaxies(linesOfText, expansionFactor = 2)
+      .combinations(2)
+      .foldLeft(0L)((acc, pair) =>
+        acc + distanceOfTwoGalaxies(pair.head, pair.last)
+      )
+
   println(partOneSolution)
 
-  val partTwoSolution = totalDistanceOfAllGalaxies(
+  val partTwoSolution =
     parseGalaxies(linesOfText, expansionFactor = 1000000)
-  )
+      .combinations(2)
+      .foldLeft(0L)((acc, pair) =>
+        acc + distanceOfTwoGalaxies(pair.head, pair.last)
+      )
+
   println(partTwoSolution)
 
 }
