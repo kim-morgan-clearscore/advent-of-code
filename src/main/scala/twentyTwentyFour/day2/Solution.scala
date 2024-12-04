@@ -22,6 +22,19 @@ object Solution extends App {
     List(1, 3, 6, 7, 9)
   )
 
+  val edgeCases = List(
+    List(48, 46, 47, 49, 51, 54, 56),
+    List(1, 1, 2, 3, 4, 5),
+    List(1, 2, 3, 4, 5, 5),
+    List(5, 1, 2, 3, 4, 5),
+    List(1, 4, 3, 2, 1),
+    List(1, 6, 7, 8, 9),
+    List(1, 2, 3, 4, 3),
+    List(9, 8, 7, 6, 7),
+    List(7, 10, 8, 10, 11),
+    List(29, 28, 27, 25, 26, 25, 22, 20)
+  )
+
   def isStrictlyAscending(nums: List[Int]): Boolean =
     nums
       .zip(nums.tail)
@@ -45,13 +58,19 @@ object Solution extends App {
     }
   }
 
-  def isSafe(nums: List[Int]): Boolean =
+  def isSafe(nums: List[Int]): Boolean = {
     if (isStrictlyAscending(nums) || isStrictlyDescending(nums))
       safeDistances(nums)
     else false
+  }
+
+  def checkWithIndexIgnored(nums: List[Int], index: Int): Boolean = {
+    val (firstPart, secondPart) = nums.splitAt(index)
+    val newNums = firstPart ++ secondPart.tail
+    isSafe(newNums)
+  }
 
   def checkForSafeRemovable(nums: List[Int]): Boolean = {
-    val ascendingOrDescending = List(Ascending, Descending)
 
     val directions = nums
       .zip(nums.tail)
@@ -65,41 +84,65 @@ object Solution extends App {
       .map { case (num1, num2) => Math.abs(num1 - num2) }
       .zipWithIndex
 
-    val directionCheck = ascendingOrDescending.map(dir =>
-      if (directions.map(_._1).count(_ == dir) == 1) {
-        val indexToIgnore = directions.find { case (d, _) => d == dir }.get._2
-        val (firstPart, secondPart) = nums.splitAt(indexToIgnore)
-        val newNums = firstPart ++ secondPart.tail
-        safeDistances(newNums)
+    val hasRemovableAscending =
+      if (directions.map(_._1).count(_ == Ascending) == 1) {
+        val indexToIgnore =
+          directions.find { case (d, _) => d == Ascending }.get._2
+        checkWithIndexIgnored(nums, indexToIgnore) || checkWithIndexIgnored(
+          nums,
+          indexToIgnore + 1
+        )
       } else false
-    )
 
-    val sameCheck = if (directions.map(_._1).count(_ == Same) == 2) {
+    val hasRemovableDescending =
+      if (directions.map(_._1).count(_ == Descending) == 1) {
+        val indexToIgnore =
+          directions.find { case (d, _) => d == Descending }.get._2
+        checkWithIndexIgnored(nums, indexToIgnore) || checkWithIndexIgnored(
+          nums,
+          indexToIgnore + 1
+        )
+      } else false
+
+    val hasRemovableSame = if (directions.map(_._1).count(_ == Same) == 1) {
       val indexToIgnore = directions.find { case (d, _) => d == Same }.get._2
-      val (firstPart, secondPart) = nums.splitAt(indexToIgnore)
-      val newNums = firstPart ++ secondPart.tail
-      safeDistances(newNums)
+      checkWithIndexIgnored(nums, indexToIgnore)
     } else false
 
-    val removableDirectionExists = directionCheck.filter(_ == true).length > 0
-
-    val diffCheck =
+    val hasRemovableDiff =
       if (diffs.count { case (diff, i) => diff == 0 || diff > 4 } == 1) {
         val indexToIgnore = diffs.find { case (d, _) => d == 0 || d > 4 }.get._2
         val (firstPart, secondPart) = nums.splitAt(indexToIgnore)
         val newNums = firstPart ++ secondPart.tail
-        safeDistances(newNums)
+        isSafe(newNums)
       } else false
 
-    removableDirectionExists || diffCheck || sameCheck
+    hasRemovableSame || hasRemovableDescending || hasRemovableAscending || hasRemovableDiff
   }
 
-  def isSafeWithRemovable(nums: List[Int]): Boolean = if (
-    isStrictlyAscending(nums) || isStrictlyDescending(nums)
-  ) safeDistances(nums)
-  else checkForSafeRemovable(nums)
+  def isSafeWithRemovable(nums: List[Int]): Boolean =
+    isSafe(nums) || checkForSafeRemovable(nums)
 
   val numberOfSafe = linesOfInt.map(isSafe).filter(identity).length
   println(numberOfSafe)
+
+  val numberOfSafeWithRemovable =
+    linesOfInt.map(isSafeWithRemovable).filter(identity).length
+  println(numberOfSafeWithRemovable)
+
+  //for debugging
+//  println(
+//    linesOfInt
+//      .map(isSafe)
+//      .zipWithIndex
+//      .zip(linesOfInt.map(isSafeWithRemovable).zipWithIndex)
+//      .filter { case ((b1, _), (b2, _)) =>
+//        b1 != b2
+//      }
+//      .map { case ((_, intVal), _) =>
+//        intVal
+//      }
+//      .map(int => linesOfInt(int))
+//  )
 
 }
