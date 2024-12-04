@@ -59,7 +59,7 @@ object puzzle extends App {
           case "L" => BottomLeftCorner
           case "S" => Start
           case "-" => Horizontal
-          case "7" => TopRightCorner
+          case "twentyTwentyThree/7" => TopRightCorner
           case "|" => Vertical
           case "." => Empty
         }
